@@ -3,7 +3,7 @@ import { useAirdropStore } from '../store';
 import { Layers, Sparkles, LogIn, UserPlus, Info } from 'lucide-react';
 
 export default function AuthPage() {
-  const { setUser, fetchInitialData } = useAirdropStore();
+  const { setUser, fetchInitialData, theme } = useAirdropStore();
   const [isLogin, setIsLogin] = useState(true);
   
   // Inputs
@@ -47,53 +47,53 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f6f1] flex flex-col items-center justify-center p-6 font-sans text-xs">
+    <div className="min-h-screen bg-[#f8f6f1] dark:bg-[#0c0a09] text-[#2e2c29] dark:text-[#f4f3f1] flex flex-col items-center justify-center p-6 font-sans text-xs transition-colors duration-200">
       {/* Branding Header */}
       <div className="text-center space-y-3 mb-8">
-        <div className="inline-flex items-center gap-2 bg-[#fcfbfa] border border-[#e4dfd5] px-3.5 py-1.5 rounded-full shadow-3xs">
-          <Layers className="h-4 w-4 text-emerald-800" />
-          <span className="font-display font-black text-xs uppercase tracking-widest text-[#2e2c29]">Airdrop Hub</span>
+        <div className="inline-flex items-center gap-2 bg-[#fcfbfa] dark:bg-[#141210] border border-[#e4dfd5] dark:border-[#272421] px-3.5 py-1.5 rounded-full shadow-3xs">
+          <Layers className="h-4 w-4 text-emerald-800 dark:text-emerald-500" />
+          <span className="font-sans font-extrabold text-[#2e2c29] dark:text-[#f4f3f1] text-xs uppercase tracking-widest">Airdrop Manager OS</span>
         </div>
-        <p className="text-[#8c857b] font-medium text-[11px] max-w-xs leading-relaxed">
+        <p className="text-[#8c857b] dark:text-[#a1998f] font-semibold text-[11px] max-w-xs leading-relaxed">
           The professional platform to manage multi-chain campaign operations, analyze volume stats, and track tasks.
         </p>
       </div>
 
-      <div className="w-full max-w-sm bg-[#fcfbfa] border border-[#e4dfd5] rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
-        {/* Toggle navigation tab */}
-        <div className="flex border-b border-[#e4dfd5] bg-[#f5f2eb]">
+      <div className="w-full max-w-sm bg-[#fcfbfa] dark:bg-[#141210] border border-[#e4dfd5] dark:border-[#272421] rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
+        {/* Toggle navigation tabs */}
+        <div className="flex border-b border-[#e4dfd5] dark:border-[#272421] bg-[#f5f2eb] dark:bg-[#1c1a17]">
           <button
             type="button"
             onClick={() => setIsLogin(true)}
-            className={`flex-1 py-3.5 text-center font-bold uppercase tracking-widest text-[10px] transition-all border-r border-[#e4dfd5] ${isLogin ? 'bg-[#fcfbfa] text-[#2e2c29]' : 'text-[#8c857b] hover:bg-[#eae6db]/60 hover:text-[#2e2c29]'}`}
+            className={`flex-1 py-3.5 text-center font-extrabold uppercase tracking-widest text-[9px] transition-all border-r border-[#e4dfd5] dark:border-[#272421] ${isLogin ? 'bg-[#fcfbfa] dark:bg-[#141210] text-[#2e2c29] dark:text-[#f4f3f1]' : 'text-[#8c857b] dark:text-[#a1998f] hover:bg-[#eae6db]/60 dark:hover:bg-neutral-800'}`}
           >
             Sign In
           </button>
           <button
             type="button"
             onClick={() => setIsLogin(false)}
-            className={`flex-1 py-3.5 text-center font-bold uppercase tracking-widest text-[10px] transition-all ${!isLogin ? 'bg-[#fcfbfa] text-[#2e2c29]' : 'text-[#8c857b] hover:bg-[#eae6db]/60 hover:text-[#2e2c29]'}`}
+            className={`flex-1 py-3.5 text-center font-extrabold uppercase tracking-widest text-[9px] transition-all ${!isLogin ? 'bg-[#fcfbfa] dark:bg-[#141210] text-[#2e2c29] dark:text-[#f4f3f1]' : 'text-[#8c857b] dark:text-[#a1998f] hover:bg-[#eae6db]/60 dark:hover:bg-neutral-800'}`}
           >
             Register
           </button>
         </div>
 
-        {/* Form Body */}
+        {/* Form elements container */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="bg-rose-50 border border-rose-200 text-rose-800 p-3 rounded-xl font-medium leading-relaxed">
+            <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 text-rose-800 dark:text-rose-400 p-3 rounded-xl font-bold leading-normal">
               {error}
             </div>
           )}
 
           {!isLogin && (
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-[#8c857b] uppercase tracking-wider">Alias Username *</label>
+              <label className="text-[10px] font-bold text-[#8c857b] dark:text-[#a1998f] uppercase tracking-wider block">Alias Username *</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. sybil_master"
-                className="w-full px-3.5 py-2.5 bg-[#fcfbfa] border border-[#e4dfd5] rounded-xl text-xs text-[#2e2c29] placeholder-[#a1998f] outline-hidden focus:border-[#2e2c29] focus:ring-4 focus:ring-[#2e2c29]/5 transition-all"
+                className="w-full px-3.5 py-2.5 bg-[#fcfbfa] dark:bg-[#13110f] border border-[#e4dfd5] dark:border-[#272421] rounded-xl text-xs text-[#2e2c29] dark:text-[#f4f3f1] outline-hidden focus:border-[#2e2c29]"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
@@ -101,11 +101,11 @@ export default function AuthPage() {
           )}
 
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-[#8c857b] uppercase tracking-wider">Email Address *</label>
+            <label className="text-[10px] font-bold text-[#8c857b] dark:text-[#a1998f] uppercase tracking-wider block">Email Address *</label>
             <input
               type="email"
               required
-              className="w-full px-3.5 py-2.5 bg-[#fcfbfa] border border-[#e4dfd5] rounded-xl text-xs text-[#2e2c29] placeholder-[#a1998f] outline-hidden focus:border-[#2e2c29] focus:ring-4 focus:ring-[#2e2c29]/5 transition-all"
+              className="w-full px-3.5 py-2.5 bg-[#fcfbfa] dark:bg-[#13110f] border border-[#e4dfd5] dark:border-[#272421] rounded-xl text-xs text-[#2e2c29] dark:text-[#f4f3f1] outline-hidden focus:border-[#2e2c29]"
               placeholder="operator@airdrop.io"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -113,11 +113,11 @@ export default function AuthPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-[#8c857b] uppercase tracking-wider">Secure Passphrase *</label>
+            <label className="text-[10px] font-bold text-[#8c857b] dark:text-[#a1998f] uppercase tracking-wider block">Secure Passphrase *</label>
             <input
               type="password"
               required
-              className="w-full px-3.5 py-2.5 bg-[#fcfbfa] border border-[#e4dfd5] rounded-xl text-xs text-[#2e2c29] placeholder-gray-300 font-mono outline-hidden focus:border-[#2e2c29] focus:ring-4 focus:ring-[#2e2c29]/5 transition-all"
+              className="w-full px-3.5 py-2.5 bg-[#fcfbfa] dark:bg-[#13110f] border border-[#e4dfd5] dark:border-[#272421] rounded-xl text-xs text-[#2e2c29] dark:text-[#f4f3f1] outline-hidden font-mono"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -127,16 +127,16 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3 bg-[#2e2c29] hover:bg-neutral-800 text-white font-bold uppercase tracking-wider rounded-xl hover:shadow-md disabled:opacity-50 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+            className="w-full mt-2 py-3 bg-[#2e2c29] dark:bg-[#eae6db] hover:opacity-90 text-white dark:text-neutral-900 font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer"
           >
             {isLogin ? <LogIn className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-            <span className="text-[10px]">{loading ? 'Verifying...' : isLogin ? 'Access Console' : 'Activate Account'}</span>
+            <span className="text-[10px]">{loading ? 'Verifying Node Authenticity...' : isLogin ? 'Access Command Console' : 'Activate Sandbox Account'}</span>
           </button>
         </form>
 
-        <div className="border-t border-[#e4dfd5] px-6 py-4 bg-[#f5f2eb]/70 flex items-start gap-3 text-[10px] text-[#8c857b] leading-relaxed font-medium">
-          <Info className="h-4 w-4 text-[#8c857b] shrink-0 mt-0.5" />
-          <span>Type any email and passphrase to login or register instantly in sandbox mode. No real database registration required.</span>
+        <div className="border-t border-[#e4dfd5] dark:border-[#272421] px-6 py-4 bg-[#f5f2eb]/70 dark:bg-[#1c1a17]/50 flex items-start gap-3 text-[10px] text-[#8c857b] dark:text-[#a1998f] leading-relaxed font-bold">
+          <Info className="h-4 w-4 text-[#8c857b] dark:text-[#a1998f] shrink-0 mt-0.5" />
+          <span>Type any mock credential or faucet keys to register instantly in airdrop management sandbox mode.</span>
         </div>
       </div>
     </div>

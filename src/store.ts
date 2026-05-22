@@ -26,12 +26,16 @@ interface AirdropStore {
   error: string | null;
   commandPaletteOpen: boolean;
   searchQuery: string;
+  theme: 'warm' | 'dark';
+  density: 'compact' | 'relaxed';
 
   // Actions
   setTab: (tab: string) => void;
   setUser: (u: User | null, token: string | null) => void;
   setCommandPalette: (open: boolean) => void;
   setSearchQuery: (q: string) => void;
+  toggleTheme: () => void;
+  toggleDensity: () => void;
 
   // Fetch logic
   fetchInitialData: () => Promise<void>;
@@ -82,11 +86,28 @@ export const useAirdropStore = create<AirdropStore>((set, get) => ({
   error: null,
   commandPaletteOpen: false,
   searchQuery: '',
+  theme: (typeof window !== 'undefined' && localStorage.getItem('theme') as 'warm' | 'dark') || 'warm',
+  density: (typeof window !== 'undefined' && localStorage.getItem('density') as 'compact' | 'relaxed') || 'compact',
 
   setTab: (tab) => set({ activeTab: tab }),
   setUser: (user, token) => set({ user, token }),
   setCommandPalette: (commandPaletteOpen) => set({ commandPaletteOpen }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
+  toggleTheme: () => {
+    const next = get().theme === 'warm' ? 'dark' : 'warm';
+    localStorage.setItem('theme', next);
+    if (next === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    set({ theme: next });
+  },
+  toggleDensity: () => {
+    const next = get().density === 'compact' ? 'relaxed' : 'compact';
+    localStorage.setItem('density', next);
+    set({ density: next });
+  },
 
   fetchGas: async () => {
     try {
