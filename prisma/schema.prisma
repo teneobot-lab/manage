@@ -1,0 +1,293 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  admin
+  manager
+  member
+}
+
+enum Priority {
+  high
+  medium
+  low
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
+
+enum CampaignStatus {
+  active
+  completed
+  missed
+  pending
+}
+
+enum TaskSubmissionStatus {
+  submitted
+  approved
+  rejected
+}
+
+enum SocialType {
+  twitter
+  discord
+  telegram
+  gmail
+  github
+}
+
+enum ProxyStatus {
+  active
+  banned
+  slow
+}
+
+model User {
+  id               String           @id @default(uuid())
+  username         String           @unique
+  email            String           @unique
+  passwordHash     String
+  avatar           String           @default("")
+  role             Role             @default(member)
+  is2FAEnabled     Boolean          @default(false)
+  emailVerified    Boolean          @default(false)
+  status           String           @default("active") // "active" | "suspended"
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+  
+  deviceSessions   DeviceSession[]
+  activityLogs     ActivityLog[]
+  teamAssignments  TeamMember[]
+  notifications    Notification[]
+
+  @@index([email])
+}
+
+model DeviceSession {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ip          String
+  deviceName  String
+  location    String
+  platform    String
+  token       String   @unique
+  lastActive  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Campaign {
+  id               String          @id @default(uuid())
+  name             String
+  difficulty       Difficulty      @default(medium)
+  category         String          @default("L2") // L1, L2, DeFi, DePIN, GameFi, AI
+  priority         Priority        @default(medium)
+  status           CampaignStatus  @default(active)
+  rewardEstimation Float           @default(0.0)
+  deadline         DateTime
+  notesString      String          @db.Text
+  participants     Int             @default(0)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deletedAt        DateTime?
+
+  tasks            Task[]
+  farmingSessions  FarmingSession[]
+  rewards          RewardLog[]
+
+  @@index([status])
+}
+
+model Wallet {
+  id               String           @id @default(uuid())
+  address          String           @unique
+  label            String
+  chain            String           @default("EVM") // EVM, Solana, Bitcoin, Cosmos
+  groupName        String           @default("General") // "Farming Main", "Sybil Bot", "Testnet Roll"
+  balanceUsd       Float            @default(0.0)
+  riskIndicator    String           @default("safe") // safe, warning, high_risk
+  transactionCount Int              @default(0)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+
+  submissions      TaskSubmission[]
+  socialAccounts   SocialAccount[]
+  farmingSessions  FarmingSession[]
+  rewards          RewardLog[]
+
+  @@index([address])
+}
+
+model Task {
+  id                 String           @id @default(uuid())
+  campaignId         String
+  campaign           Campaign         @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  name               String
+  dependencyId       String?
+  isRecurring        Boolean          @default(false)
+  recurIntervalDays  Int              @default(1)
+  priorityScore      Int              @default(50)
+  dueReminderDate    DateTime?
+  automationReady    Boolean          @default(false)
+  manualVerification Boolean          @default(false)
+  aiTips             String           @db.Text
+  checklistString    String           @db.Text // JSON string list of checkboxes
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  deletedAt          DateTime?
+
+  submissions        TaskSubmission[]
+
+  @@index([campaignId])
+}
+
+model TaskSubmission {
+  id              String               @id @default(uuid())
+  taskId          String
+  task            Task                 @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  walletId        String
+  wallet          Wallet               @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  status          TaskSubmissionStatus @default(submitted)
+  proofScreenshot String?              @db.Text
+  comment         String               @db.Text
+  submittedAt     DateTime             @default(now())
+
+  @@index([taskId])
+  @@index([walletId])
+}
+
+model SocialAccount {
+  id           String      @id @default(uuid())
+  type         SocialType
+  handle       String
+  email        String
+  proxyUsed    String      @default("")
+  status       String      @default("active") // active, rate-limited, disconnected
+  walletIdBind String?
+  wallet       Wallet?     @relation(fields: [walletIdBind], references: [id], onDelete: SetNull)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([walletIdBind])
+}
+
+model TeamWorkspace {
+  id          String       @id @default(uuid())
+  name        String
+  description String       @db.Text
+  inviteCode  String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  members     TeamMember[]
+}
+
+model TeamMember {
+  id          String        @id @default(uuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String
+  workspace   TeamWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  roleInTeam  String        @default("contributor") // owner, contributor, spectator
+  createdAt   DateTime      @default(now())
+
+  @@index([userId])
+  @@index([workspaceId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String   @db.Text
+  type      String   @default("info") // alert, success, warning, info
+  read      Boolean  @default(false)
+  timestamp DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ProxyItem {
+  id         String      @id @default(uuid())
+  ip         String
+  port       Int
+  username   String
+  status     ProxyStatus @default(active)
+  responseMs Int         @default(120)
+  label      String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model RewardLog {
+  id           String   @id @default(uuid())
+  campaignId   String
+  campaign     Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  walletId     String
+  wallet       Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  amount       Float
+  tokenSymbol  String
+  usdValue     Float
+  dateReceived DateTime @default(now())
+
+  @@index([campaignId])
+  @@index([walletId])
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  details   String   @db.Text
+  ip        String
+  device    String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model APIKey {
+  id         String   @id @default(uuid())
+  label      String
+  keyPrefix  String
+  hash       String
+  createdAt  DateTime @default(now())
+  lastUsedAt DateTime @default(now())
+  status     String   @default("active") // active, revoked
+}
+
+model FarmingSession {
+  id              String   @id @default(uuid())
+  walletId        String
+  wallet          Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  campaignId      String
+  campaign        Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  status          String   @default("farming") // farming, idle, ended
+  startTime       DateTime @default(now())
+  durationMinutes Int      @default(0)
+
+  @@index([walletId])
+  @@index([campaignId])
+}
+
+model AppSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String @db.Text
+}

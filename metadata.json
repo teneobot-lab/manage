@@ -1,0 +1,6 @@
+{
+  "name": "Airdrop Manager Platform",
+  "description": "Enterprise-grade airdrop farming and multi-wallet monitoring workspace.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
