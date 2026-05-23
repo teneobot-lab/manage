@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://manage-api.invengudang.my.id/api/:path*"
+    }
+  ]
+}
